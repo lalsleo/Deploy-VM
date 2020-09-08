@@ -1,0 +1,54 @@
+---
+- name: "Create a VM from  template"
+  gather_facts: no
+  hosts: localhost
+
+  tasks:
+  - name: Deploy the VM
+    vmware_guest:
+      username: '{{ lookup("env", "VMWARE_USER") }}'
+      password: '{{ lookup("env", "VMWARE_PASSWORD") }}'
+      hostname: '{{ lookup("env", "VMWARE_HOST") }}'
+      template: "{{ os_version }}Server"
+      validate_certs: no
+      cluster: "{{ vcenter_cluster }}"
+      datacenter: "{{ vcenter_datacenter }}"
+      folder: /
+      state: poweredon
+      datastore: "{{ vcenter_datastore }}"
+      annotation: "{{ description }} - Server Setup: {{ '%m-%d-%Y' | strftime }}"
+      name: "{{ vm_name|upper }}"
+      networks:
+        - name: "{{ vcenter_network }}"
+          device_type: vmxnet3
+          ip: "{{ vm_ip }}"
+          netmask: "{{ vm_netmask }}"
+          gateway: "{{ vm_gateway }}"
+          dns_servers:
+          - "{{ dns1 }}"
+          - "{{ dns2 }}"
+      hardware:
+          memory_mb: "{{ vm_memory *1024 }}"
+          num_cpus: "{{ vm_vcpu }}"
+          num_cpu_cores_per_socket: "{{ vm_vcpu_cores }}"
+          hotadd_cpu: True
+                                                                                                                                  22,39         Top           num_cpu_cores_per_socket: "{{ vm_vcpu_cores }}"
+          hotadd_cpu: True
+          hotremove_cpu: True
+          hotadd_memory: True
+      customization:
+        domain: "{{ domain }}"
+        domainadmin: "{{ domain_username }}"
+        domainadminpassword: "{{ domain_password }}"
+        fullname: " {{ company }}"
+        orgname: "{{ company }}"
+        joindomain: "{{ domain }}"
+        timezone: "{{ tz }}"
+        autologon: True
+        password: '{{ localwin_password }}'
+      wait_for_customization: 'Yes'
+      wait_for_ip_address: 'No'
+
+  - name: Wait for 60 Seconds for things to boot up
+    wait_for:
+      timeout: 60
