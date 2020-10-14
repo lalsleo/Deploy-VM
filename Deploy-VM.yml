@@ -32,8 +32,6 @@
           num_cpus: "{{ vm_vcpu }}"
           num_cpu_cores_per_socket: "{{ vm_vcpu_cores }}"
           hotadd_cpu: True
-                                                                                                                                  22,39         Top           num_cpu_cores_per_socket: "{{ vm_vcpu_cores }}"
-          hotadd_cpu: True
           hotremove_cpu: True
           hotadd_memory: True
       customization:
